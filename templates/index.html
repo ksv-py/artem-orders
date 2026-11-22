@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Artem Orders{% endblock %}
+{% block content %}
+<h1>Today: {{ today.strftime('%d %b %Y') }}</h1>
+
+<div class="statrow">
+  <div class="stat"><strong>{{ in_progress }}</strong><span>in progress</span></div>
+  <div class="stat"><strong class="{{ 'red' if overdue else '' }}">{{ overdue|length }}</strong><span>overdue</span></div>
+  <div class="stat"><strong>{{ due_week|length }}</strong><span>due this week</span></div>
+  <div class="stat"><strong>{{ delivered }}</strong><span>delivered</span></div>
+</div>
+
+{% if overdue %}
+<div class="banner red">
+  <strong>Overdue &mdash; needs attention</strong>
+  <ul class="plain">
+    {% for o in overdue %}
+    <li><a href="{{ url_for('order_detail', order_id=o.id) }}">{{ o.customer_name }} &mdash; {{ o.item }}</a> &mdash; was due {{ o.delivery_date }} ({{ o.karigar_name or 'no karigar' }})</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<h2>Due soon</h2>
+{% if due_week %}
+<div class="cards">
+  {% for o in due_week %}
+  <a class="card link {{ o.state }}" href="{{ url_for('order_detail', order_id=o.id) }}">
+    <strong>{{ o.customer_name }} &mdash; {{ o.item }}</strong>
+    <span>{{ o.size or '' }} &middot; {{ o.wood or '' }}</span>
+    <span>Due {{ o.delivery_date }} &middot; {{ o.status }} &middot; {{ o.karigar_name or 'no karigar' }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p>No orders due this week.</p>
+{% endif %}
+
+<h2>Karigar workload</h2>
+<div class="cards">
+  {% for w in workload %}
+  <div class="card">
+    <strong>{{ w.karigar.name }} &mdash; {{ w.karigar.skill }}</strong>
+    <span>{{ w.jobs|length }} job{{ 's' if w.jobs|length != 1 else '' }} in progress</span>
+    <ul class="plain">
+      {% for j in w.jobs %}
+      <li><a href="{{ url_for('order_detail', order_id=j.id) }}">{{ j.customer_name }} &mdash; {{ j.item }}</a> (due {{ j.delivery_date }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+
+<p><a class="btn" href="{{ url_for('order_list') }}">See all orders</a></p>
+{% endblock %}

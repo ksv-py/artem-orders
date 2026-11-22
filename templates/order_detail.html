@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ order.customer_name }} - {{ order.item }} - Artem Orders{% endblock %}
+{% block content %}
+<h1>{{ order.customer_name }} &mdash; {{ order.item }}</h1>
+<div class="card {{ order.state }}">
+  <p><strong>Size:</strong> {{ order.size or '-' }} &nbsp; <strong>Wood:</strong> {{ order.wood or '-' }}</p>
+  <p><strong>Status:</strong> {{ order.status }} &nbsp; <strong>Delivery date:</strong> {{ order.delivery_date or 'no date' }}</p>
+  <p><strong>Karigar:</strong> {{ order.karigar_name or 'not assigned' }}</p>
+  {% if order.notes %}<p><strong>Notes:</strong> {{ order.notes }}</p>{% endif %}
+  {% if order.design_photo %}
+  <p><strong>Design photo:</strong></p>
+  <img class="photo" src="{{ url_for('uploaded_file', filename=order.design_photo) }}" alt="Design photo">
+  {% endif %}
+  {% if order.state == 'overdue' %}<p class="red"><strong>Overdue &mdash; delivery date has passed.</strong></p>{% endif %}
+  {% if order.state == 'due-today' %}<p><strong>Due today.</strong></p>{% endif %}
+</div>
+
+<p><a class="btn big" href="{{ wa_link }}" target="_blank">Send update to customer on WhatsApp</a></p>
+<p class="muted small">WhatsApp opens with the update text ready. Photos cannot go inside that link, so share the work photos from your phone gallery along with the message.</p>
+
+<h2>Update status / karigar</h2>
+<form method="post" action="{{ url_for('order_status', order_id=order.id) }}" class="form inline-form">
+  <label>Status
+    <select name="status">
+      {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == order.status else '' }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Karigar
+    <select name="karigar_id">
+      <option value="">-- Not assigned --</option>
+      {% for k in karigars %}<option value="{{ k.id }}" {{ 'selected' if k.id == order.karigar_id else '' }}>{{ k.name }} ({{ k.skill }})</option>{% endfor %}
+    </select>
+  </label>
+  <button class="btn" type="submit">Update</button>
+</form>
+
+<h2>Work photos</h2>
+{% if photos %}
+<div class="photogrid">
+  {% for p in photos %}
+  <figure>
+    <img class="photo" src="{{ url_for('uploaded_file', filename=p.filename) }}" alt="{{ p.caption or 'Work photo' }}">
+    <figcaption>{{ p.stage or '' }}{% if p.stage and p.caption %} &mdash; {% endif %}{{ p.caption or '' }}</figcaption>
+  </figure>
+  {% endfor %}
+</div>
+{% else %}
+<p>No work photos yet.</p>
+{% endif %}
+<form method="post" action="{{ url_for('order_photo', order_id=order.id) }}" enctype="multipart/form-data" class="form">
+  <label>Add a progress photo
+    <input type="file" name="photo" accept="image/*" capture="environment" required>
+  </label>
+  <label>Stage
+    <input type="text" name="stage" placeholder="e.g. Cutting, Assembly, Polish">
+  </label>
+  <label>Caption
+    <input type="text" name="caption" placeholder="e.g. Cutting done, edges finished">
+  </label>
+  <button class="btn" type="submit">Add photo</button>
+</form>
+
+<p><a href="{{ url_for('order_list') }}">Back to orders</a></p>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}New Order - Artem Orders{% endblock %}
+{% block content %}
+<h1>New Order</h1>
+<form method="post" enctype="multipart/form-data" class="form">
+  <label>Customer name
+    <input type="text" name="customer_name" required placeholder="e.g. Sharma ji">
+  </label>
+  <label>Item
+    <select name="item">
+      {% for i in items %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Size / measurements
+    <input type="text" name="size" placeholder="e.g. 6 ft x 7 ft">
+  </label>
+  <label>Wood / material
+    <select name="wood">
+      {% for w in woods %}<option value="{{ w }}">{{ w }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Delivery date
+    <input type="date" name="delivery_date">
+  </label>
+  <label>Karigar
+    <select name="karigar_id">
+      <option value="">-- Not assigned yet --</option>
+      {% for k in karigars %}<option value="{{ k.id }}">{{ k.name }} ({{ k.skill }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Design photo
+    <input type="file" name="design_photo" accept="image/*" capture="environment">
+  </label>
+  <label>Notes
+    <textarea name="notes" rows="3" placeholder="Anything the karigar should know"></textarea>
+  </label>
+  <button class="btn big" type="submit">Save order</button>
+</form>
+<p><a href="{{ url_for('order_list') }}">Back to orders</a></p>
+{% endblock %}

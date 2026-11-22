@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}All Orders - Artem Orders{% endblock %}
+{% block content %}
+<h1>All Orders</h1>
+<p class="muted">Soonest delivery date first. Red = overdue, amber = due today or this week.</p>
+{% if orders %}
+<div class="cards">
+  {% for o in orders %}
+  <a class="card link {{ o.state }} {{ 'done' if o.status == 'Delivered' else '' }}" href="{{ url_for('order_detail', order_id=o.id) }}">
+    <strong>{{ o.customer_name }} &mdash; {{ o.item }}</strong>
+    <span>{{ o.size or '' }}{% if o.size and o.wood %} &middot; {% endif %}{{ o.wood or '' }}</span>
+    <span>Due {{ o.delivery_date or 'no date' }} &middot; {{ o.status }} &middot; {{ o.karigar_name or 'no karigar' }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p>No orders yet.</p>
+{% endif %}
+<p><a class="btn" href="{{ url_for('order_new') }}">+ New Order</a></p>
+{% endblock %}
