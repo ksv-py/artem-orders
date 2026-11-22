@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Karigars - Artem Orders{% endblock %}
+{% block content %}
+<h1>Karigars</h1>
+{% for w in workload %}
+<div class="card">
+  <h2>{{ w.karigar.name }} &mdash; {{ w.karigar.skill }}</h2>
+  {% if w.karigar.phone %}<p>Phone: {{ w.karigar.phone }}</p>{% endif %}
+  {% if w.jobs %}
+  <p><strong>Current jobs ({{ w.jobs|length }}):</strong></p>
+  <ul class="plain">
+    {% for j in w.jobs %}
+    <li class="{{ j.state }}"><a href="{{ url_for('order_detail', order_id=j.id) }}">{{ j.customer_name }} &mdash; {{ j.item }}</a> &mdash; {{ j.status }}, due {{ j.delivery_date }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No jobs right now.</p>
+  {% endif %}
+</div>
+{% endfor %}
+
+<h2>Add a karigar</h2>
+<form method="post" class="form">
+  <label>Name
+    <input type="text" name="name" required placeholder="e.g. Raju">
+  </label>
+  <label>Skill
+    <input type="text" name="skill" required placeholder="e.g. Carpenter, Polisher, Painter, Helper">
+  </label>
+  <label>Phone (optional)
+    <input type="text" name="phone" placeholder="e.g. 98XXXXXXXX">
+  </label>
+  <button class="btn" type="submit">Add karigar</button>
+</form>
+{% endblock %}
